@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj": {}
+    "c:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj": {
+    "c:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
+        "projectUniqueName": "c:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
         "projectName": "StudentOrganiserApp",
-        "projectPath": "C:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
+        "projectPath": "c:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
         "packagesPath": "C:\\Users\\nstoj\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\obj\\",
+        "outputPath": "c:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -49,6 +49,12 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "CassandraCSharpDriver": {
+              "target": "Package",
+              "version": "[3.22.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
