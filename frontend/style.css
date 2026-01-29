@@ -1,0 +1,351 @@
+body {
+    font-family: 'Architects Daughter', cursive;
+    background-color: #f8f6e9;
+    color: #2d3436;
+    margin: 0;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+#app-container {
+    width: 100%;
+    max-width: 1100px;
+    background-color: #fffdf0;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+}
+
+h1 {
+    font-family: 'Architects Daughter', cursive;
+    color: #422006;
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 4px;
+    background-color: #eab308;
+    border-radius: 2px;
+}
+
+.view-switcher {
+    display: flex;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 5px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.view-switcher button {
+    padding: 10px 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    color: #636e72;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.view-switcher button.active {
+    background-color: #ffffff;
+    color: #854d0e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.weekly-view-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 15px;
+}
+
+.day-cell {
+    min-height: 240px;
+    padding: 20px;
+    border: none;
+    border-radius: 2px;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+}
+
+.day-cell:nth-child(7n+1) { background-color: #fef9c3; }
+.day-cell:nth-child(7n+2) { background-color: #ffedd5; }
+.day-cell:nth-child(7n+3) { background-color: #f0fdf4; }
+.day-cell:nth-child(7n+4) { background-color: #fae8ff; }
+.day-cell:nth-child(7n+5) { background-color: #fce7f3; }
+.day-cell:nth-child(7n+6) { background-color: #e0f2fe; }
+.day-cell:nth-child(7n+7) { background-color: #f1f5f9; }
+
+.day-cell:hover {
+    transform: scale(1.05) rotate(1.5deg);
+    box-shadow: 8px 8px 20px rgba(0,0,0,0.15);
+    z-index: 10;
+}
+
+.day-header {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Architects Daughter', cursive;
+    font-size: 22px;
+    font-weight: bold;
+    color: #854d0e;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed rgba(133, 77, 14, 0.3);
+}
+
+.day-header .date {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #a16207;
+    opacity: 0.7;
+}
+
+.task-in-week {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 8px 30px 8px 8px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #422006;
+    border-left: 3px solid #854d0e;
+    font-family: 'Inter', sans-serif;
+}
+
+.task-in-week.done {
+    opacity: 0.5;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left-color: #a16207;
+}
+
+.task-in-week.done span {
+    text-decoration: line-through;
+    text-decoration-color: #ef4444;
+}
+
+.daily-view-container {
+    background-color: #fef9c3;
+    padding: 40px 40px 40px 60px;
+    border-radius: 2px;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+    position: relative;
+    border-left: 45px solid #fef08a; 
+    min-height: 400px;
+}
+
+.daily-view-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 8px;
+    height: 100%;
+    width: 2px;
+    background-color: #fca5a5; 
+}
+
+.daily-view-container h2 {
+    font-family: 'Architects Daughter', cursive;
+    font-size: 30px;
+    color: #854d0e;
+    margin-bottom: 25px;
+    font-weight: bold;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eab308;
+    background: transparent;
+}
+
+.task-title {
+    font-family: 'Architects Daughter', cursive;
+    font-size: 21px;
+    color: #422006;
+}
+
+.task-item.done .task-title {
+    text-decoration: line-through;
+    text-decoration-color: #ef4444; 
+    text-decoration-thickness: 2px;
+    color: #a16207;
+    opacity: 0.6;
+}
+
+.task-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    accent-color: #854d0e;
+}
+
+.delete-task-btn {
+    position: absolute;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    background-color: #dfe6e9;
+    color: #636e72;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.add-task-form {
+    margin-top: 40px;
+    padding: 30px;
+    background-color: #fef9c3;
+    border-radius: 16px;
+    border: 1px solid #f8f6e9;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.add-task-form label {
+    font-size: 13px;
+    font-weight: bold; 
+    color: #854d0e;
+    text-transform: uppercase;
+}
+
+.add-task-form input, 
+.add-task-form select {
+    padding: 12px;
+    border: 2px solid #f1f3f5;
+    border-radius: 10px;
+    background-color: #f8f6e9; 
+    font-family: 'Inter', sans-serif;
+    color: #2d3436;
+}
+
+.add-task-form button {
+    background-color: #854d0e;
+    color: white;
+    padding: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.custom-modal-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(66, 32, 6, 0.4); 
+    backdrop-filter: blur(5px);
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    z-index: 2000;
+}
+
+.custom-modal-box {
+    background: #fffdf0;
+    padding: 30px;
+    border-radius: 4px;
+    width: 380px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    border-top: 15px solid #854d0e;
+    position: relative;
+    font-family: 'Inter', sans-serif;
+}
+
+.custom-modal-box h3 {
+    font-family: 'Architects Daughter', cursive;
+    color: #854d0e;
+    font-size: 24px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.custom-modal-box p {
+    color: #422006;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.modal-buttons, .edit-form-footer {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-confirm {
+    flex: 1;
+    background: #854d0e;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    transition: background 0.2s;
+}
+
+.btn-confirm:hover {
+    background: #422006;
+}
+
+.btn-cancel {
+    flex: 1;
+    background: #f1f3f5;
+    color: #636e72;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+}
+
+.btn-cancel:hover {
+    background: #e9ecef;
+}
+
+.custom-modal-box input, 
+.custom-modal-box select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: 2px solid #f1f3f5;
+    border-radius: 10px;
+    background: #f8f9fa;
+    box-sizing: border-box;
+}

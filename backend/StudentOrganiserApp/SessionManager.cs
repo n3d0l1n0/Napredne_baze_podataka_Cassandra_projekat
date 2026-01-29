@@ -4,9 +4,9 @@ namespace StudentOrganiserApp.Data
 {
     public static class SessionManager
     {
-        private static ISession _session;
+        private static Cassandra.ISession? _session;
 
-        public static ISession GetSession()
+        public static Cassandra.ISession GetSession()
         {
             if (_session == null)
             {
