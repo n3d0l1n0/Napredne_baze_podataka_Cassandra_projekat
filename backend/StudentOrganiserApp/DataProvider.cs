@@ -10,6 +10,26 @@ namespace StudentOrganiserApp.Data
     {
         #region Student
 
+       public static Student? GetStudentForLogin(string studentID)
+        {
+            Cassandra.ISession session = SessionManager.GetSession();
+            var ps = session.Prepare("SELECT * FROM \"Student\" WHERE \"studentID\"=?");
+            var boundStatement = ps.Bind(studentID);
+            Row? row = session.Execute(boundStatement).FirstOrDefault();
+
+            if (row == null) return null;
+
+            return new Student
+            {
+                studentID = row["studentID"]?.ToString(),
+                phone = row["phone"]?.ToString(),
+                email = row["email"]?.ToString(),
+                fname = row["fname"]?.ToString(),
+                lname = row["lname"]?.ToString(),
+                password = row["password"]?.ToString()
+            };
+        }
+
         public static Student? GetStudent(string studentID)
         {
             Cassandra.ISession session = SessionManager.GetSession();
@@ -25,7 +45,8 @@ namespace StudentOrganiserApp.Data
                 phone = row["phone"]?.ToString(),
                 email = row["email"]?.ToString(),
                 fname = row["fname"]?.ToString(),
-                lname = row["lname"]?.ToString()
+                lname = row["lname"]?.ToString(),
+                password = row["password"]?.ToString()
             };
         }
 
@@ -43,7 +64,8 @@ namespace StudentOrganiserApp.Data
                     phone = row["phone"]?.ToString(),
                     email = row["email"]?.ToString(),
                     fname = row["fname"]?.ToString(),
-                    lname = row["lname"]?.ToString()
+                    lname = row["lname"]?.ToString(),
+                    password = row["password"]?.ToString()
                 });
             }
             return students;
@@ -52,11 +74,14 @@ namespace StudentOrganiserApp.Data
         public static void AddStudent(Student s)
         {
             Cassandra.ISession session = SessionManager.GetSession();
-            var ps = session.Prepare("INSERT INTO \"Student\" (\"studentID\", phone, email, fname, lname) VALUES (?, ?, ?, ?, ?)");
-            var boundStatement = ps.Bind(s.studentID, s.phone, s.email, s.fname, s.lname);
+            
+            s.password = BCrypt.Net.BCrypt.HashPassword(s.password);
+
+            var ps = session.Prepare("INSERT INTO \"Student\" (\"studentID\", phone, email, fname, lname, password) VALUES (?, ?, ?, ?, ?, ?)");
+            var boundStatement = ps.Bind(s.studentID, s.phone, s.email, s.fname, s.lname, s.password);
             session.Execute(boundStatement);
         }
-
+        
         public static void UpdateStudent(Student s)
         {
             Cassandra.ISession session = SessionManager.GetSession();

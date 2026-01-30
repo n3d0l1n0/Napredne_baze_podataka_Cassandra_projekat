@@ -28,4 +28,7 @@ app.UseHttpsRedirection();
 app.UseCors(myAllowSpecificOrigins);
 app.UseAuthorization();
 app.MapControllers();
+
+Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("sifra123"));
+
 app.Run();

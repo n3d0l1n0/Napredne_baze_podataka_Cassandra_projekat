@@ -349,3 +349,110 @@ h1::after {
     background: #f8f9fa;
     box-sizing: border-box;
 }
+#login-form {
+    max-width: 450px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #fef9c3;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#login-form label {
+    font-size: 14px;
+    font-weight: bold; 
+    color: #854d0e;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+}
+
+#login-form input {
+    padding: 14px;
+    border: 2px solid #f1f3f5;
+    border-radius: 10px;
+    background-color: #f8f6e9; 
+    font-family: 'Inter', sans-serif;
+    color: #2d3436;
+    font-size: 16px;
+}
+
+#login-form button {
+    background-color: #854d0e;
+    color: white;
+    padding: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+#login-form button:hover {
+    background-color: #422006;
+}
+
+#error-message {
+    color: #ef4444;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed rgba(133, 77, 14, 0.3);
+}
+
+.app-header h1 {
+    font-size: 28px;
+    margin-bottom: 0;
+    text-align: left;
+    width: auto;
+}
+
+.app-header h1::after {
+    display: none;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-family: 'Inter', sans-serif;
+    color: #422006;
+}
+
+.logout-btn {
+    background-color: #f1f3f5;
+    color: #636e72;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    font-size: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.logout-btn:hover {
+    background-color: #e9ecef;
+}
