@@ -2,19 +2,48 @@ export function createViewSwitcher(currentView, onViewChange) {
     const switcherDiv = document.createElement('div');
     switcherDiv.className = 'view-switcher';
 
-    const dailyButton = document.createElement('button');
-    dailyButton.textContent = 'Dnevni Prikaz';
-    if (currentView === 'daily') dailyButton.classList.add('active');
-    dailyButton.addEventListener('click', () => onViewChange('daily'));
+    const views = [
+        { id: 'daily', label: 'Dnevni Prikaz' },
+        { id: 'weekly', label: 'Nedeljni Prikaz' },
+        { id: 'archived', label: 'Arhiva' } 
+    ];
 
-    const weeklyButton = document.createElement('button');
-    weeklyButton.textContent = 'Nedeljni Prikaz';
-    if (currentView === 'weekly') weeklyButton.classList.add('active');
-    weeklyButton.addEventListener('click', () => onViewChange('weekly'));
+    views.forEach(view => {
+        const btn = document.createElement('button');
+        btn.textContent = view.label;
+        if (currentView === view.id) btn.classList.add('active');
+        btn.onclick = () => {
+            switcherDiv.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            onViewChange(view.id);
+        };
+        switcherDiv.appendChild(btn);
+    });
 
-    switcherDiv.appendChild(dailyButton);
-    switcherDiv.appendChild(weeklyButton);
     return switcherDiv;
+}
+
+export function createFilterBar(onFilterChange) {
+    const container = document.createElement('div');
+    container.className = 'filter-bar';
+
+    const label = document.createElement('label');
+    label.textContent = 'Filtriraj po tipu: ';
+
+    const select = document.createElement('select');
+    const types = ['Sve', 'Ispit', 'Kolokvijum', 'Predavanje', 'Vežbe', 'Lično'];
+    
+    types.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        select.appendChild(opt);
+    });
+
+    select.onchange = () => onFilterChange(select.value);
+
+    container.append(label, select);
+    return container;
 }
 
 export function createTaskItemElement(task, onStatusChange) {
@@ -36,7 +65,8 @@ export function createTaskItemElement(task, onStatusChange) {
 
     const meta = document.createElement('div');
     meta.className = 'task-meta';
-    meta.textContent = `Tip: ${task.type} | Prioritet: ${task.priority} | Rok: ${new Date(task.deadline).toLocaleDateString('sr-RS')}`;
+
+    meta.textContent = `Tip: ${task.type} | Prioritet: ${task.priority}`;
 
     detailsDiv.appendChild(title);
     detailsDiv.appendChild(meta);
@@ -44,6 +74,32 @@ export function createTaskItemElement(task, onStatusChange) {
     item.appendChild(detailsDiv);
 
     return item;
+}
+
+export function createTaskItemAdvanced(task, studentId, onHistory, onArchive) {
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'task-actions'; 
+
+    const historyBtn = document.createElement('button');
+    historyBtn.textContent = 'Istorija'; 
+    historyBtn.title = 'Istorija promena';
+    historyBtn.className = 'btn-icon history-btn'; 
+    historyBtn.onclick = (e) => {
+        e.stopPropagation();
+        onHistory(studentId, task.taskId, task.title);
+    };
+
+    const archiveBtn = document.createElement('button');
+    archiveBtn.textContent = 'Arhiviraj';
+    archiveBtn.title = 'Arhiviraj obavezu';
+    archiveBtn.className = 'btn-icon archive-btn'; 
+    archiveBtn.onclick = (e) => {
+        e.stopPropagation();
+        onArchive(task, studentId);
+    };
+
+    actionsDiv.append(historyBtn, archiveBtn);
+    return actionsDiv;
 }
 
 export function createAddTaskForm(onSubmit) {

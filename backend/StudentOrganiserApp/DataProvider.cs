@@ -8,9 +8,8 @@ namespace StudentOrganiserApp.Data
 {
     public static class DataProvider
     {
-        #region Student
-
-       public static Student? GetStudentForLogin(string studentID)
+        #region Login
+        public static Student? GetStudentForLogin(string studentID)
         {
             Cassandra.ISession session = SessionManager.GetSession();
             var ps = session.Prepare("SELECT * FROM \"Student\" WHERE \"studentID\"=?");
@@ -29,6 +28,9 @@ namespace StudentOrganiserApp.Data
                 password = row["password"]?.ToString()
             };
         }
+        #endregion
+        
+        #region Student
 
         public static Student? GetStudent(string studentID)
         {
@@ -74,14 +76,14 @@ namespace StudentOrganiserApp.Data
         public static void AddStudent(Student s)
         {
             Cassandra.ISession session = SessionManager.GetSession();
-            
+
             s.password = BCrypt.Net.BCrypt.HashPassword(s.password);
 
             var ps = session.Prepare("INSERT INTO \"Student\" (\"studentID\", phone, email, fname, lname, password) VALUES (?, ?, ?, ?, ?, ?)");
             var boundStatement = ps.Bind(s.studentID, s.phone, s.email, s.fname, s.lname, s.password);
             session.Execute(boundStatement);
         }
-        
+
         public static void UpdateStudent(Student s)
         {
             Cassandra.ISession session = SessionManager.GetSession();
@@ -108,7 +110,7 @@ namespace StudentOrganiserApp.Data
             var rows = session.Execute(ps.Bind(studentId, period));
             List<StudentOrganiserApp.Entities.Task> tasks = new List<StudentOrganiserApp.Entities.Task>();
 
-            foreach(var row in rows)
+            foreach (var row in rows)
             {
                 tasks.Add(new Entities.Task
                 {
@@ -157,13 +159,13 @@ namespace StudentOrganiserApp.Data
             for (int i = 0; i < 7; i++)
             {
                 DateOnly nextDate = baseDate.AddDays(i);
-                
+
                 LocalDate currentDate = new LocalDate(nextDate.Year, nextDate.Month, nextDate.Day);
-                
+
                 var dailyTasks = GetDailyPlan(studentId, currentDate);
                 weeklyTasks.AddRange(dailyTasks);
             }
-            
+
             return weeklyTasks.OrderBy(t => t.TaskTime).ToList();
         }
 
@@ -175,7 +177,7 @@ namespace StudentOrganiserApp.Data
             var rows = session.Execute(ps.Bind(studentId, type));
             List<StudentOrganiserApp.Entities.Task> tasks = new List<StudentOrganiserApp.Entities.Task>();
 
-            foreach(var row in rows)
+            foreach (var row in rows)
             {
                 tasks.Add(new Entities.Task
                 {
@@ -190,28 +192,7 @@ namespace StudentOrganiserApp.Data
             }
             return tasks;
         }
-        public static List<StudentOrganiserApp.Entities.Task> GetArchivedTasks(string studentId)
-        {
-            Cassandra.ISession session = SessionManager.GetSession();
-            var ps = session.Prepare("SELECT * FROM \"Archived_Tasks_By_Student\" WHERE student_id=?");
-            var rows = session.Execute(ps.Bind(studentId));
-            List<StudentOrganiserApp.Entities.Task> tasks = new List<StudentOrganiserApp.Entities.Task>();
 
-            foreach (var row in rows)
-            {
-                tasks.Add(new Entities.Task
-                {
-                    StudentId = row.GetValue<string>("student_id"),
-                    TaskId = row.GetValue<Guid>("task_id"),
-                    TaskTime = row.GetValue<DateTime>("finished_at"),
-                    Title = row.GetValue<string>("title"),
-                    Type = row.GetValue<string>("type"),
-                    Priority = row.GetValue<int>("priority")
-                });
-            }
-            return tasks;
-        }
-        
         public static StudentOrganiserApp.Entities.Task? GetTask(string studentId, string period, DateTime taskTime, Guid taskId)
         {
             Cassandra.ISession session = SessionManager.GetSession();
@@ -267,23 +248,33 @@ namespace StudentOrganiserApp.Data
             session.Execute(ps3.Bind(t.StudentId, t.Type, t.TaskTime, t.TaskId));
         }
 
-         public static void UpdateTask(StudentOrganiserApp.Entities.Task t, string period)
+        public static void UpdateTask(StudentOrganiserApp.Entities.Task t, string period, DateTime? oldTime = null)
         {
             Cassandra.ISession session = SessionManager.GetSession();
 
-            var existingTask = GetTask(t.StudentId, period, t.TaskTime, t.TaskId);
+            var timeToLookup = oldTime ?? t.TaskTime;
+            var existingTask = GetTask(t.StudentId, period, timeToLookup, t.TaskId);
 
-            if (existingTask != null && existingTask.Status != t.Status)
+            if (existingTask != null)
             {
-                var historyRecord = new TaskStatusHistory
+                if (existingTask.Status != t.Status)
                 {
-                    StudentId = t.StudentId,
-                    TaskId = t.TaskId,
-                    ChangeTime = DateTime.UtcNow,
-                    OldStatus = existingTask.Status,
-                    NewStatus = t.Status
-                };
-                AddTaskStatusHistory(historyRecord);
+                    AddTaskStatusHistory(new TaskStatusHistory
+                    {
+                        StudentId = t.StudentId,
+                        TaskId = t.TaskId,
+                        ChangeTime = DateTime.UtcNow,
+                        OldStatus = existingTask.Status,
+                        NewStatus = t.Status
+                    });
+                }
+
+                if (oldTime.HasValue && oldTime.Value != t.TaskTime)
+                {
+                    DeleteTask(existingTask, oldTime.Value.ToString("yyyy-MM"));
+                    AddTask(t, t.TaskTime.ToString("yyyy-MM"));
+                    return;
+                }
             }
 
             var localDate = new LocalDate(t.TaskTime.Year, t.TaskTime.Month, t.TaskTime.Day);
@@ -296,16 +287,6 @@ namespace StudentOrganiserApp.Data
 
             var ps3 = session.Prepare("UPDATE \"Tasks_By_Student_Type\" SET title=?, status=?, priority=? WHERE student_id=? AND type=? AND task_time=? AND task_id=?");
             session.Execute(ps3.Bind(t.Title, t.Status, t.Priority, t.StudentId, t.Type, t.TaskTime, t.TaskId));
-        }
-
-        public static void ArchiveTask(StudentOrganiserApp.Entities.Task t)
-        {
-            Cassandra.ISession session = SessionManager.GetSession();
-            
-            var ps = session.Prepare("INSERT INTO \"Archived_Tasks_By_Student\" (student_id, finished_at, task_id, title, type, priority) VALUES (?, ?, ?, ?, ?, ?)");
-            session.Execute(ps.Bind(t.StudentId, t.TaskTime, t.TaskId, t.Title, t.Type, t.Priority));
-
-            DeleteTask(t, t.TaskTime.ToString("yyyy-MM"));
         }
 
         #endregion
@@ -355,5 +336,49 @@ namespace StudentOrganiserApp.Data
         }
         #endregion
 
+        #region ArchiveTask
+        public static void ArchiveTask(StudentOrganiserApp.Entities.Task t)
+        {
+            Cassandra.ISession session = SessionManager.GetSession();
+
+            var ps = session.Prepare("INSERT INTO \"Archived_Tasks_By_Student\" (student_id, finished_at, task_id, title, type, priority) VALUES (?, ?, ?, ?, ?, ?)");
+            session.Execute(ps.Bind(t.StudentId, t.TaskTime, t.TaskId, t.Title, t.Type, t.Priority));
+
+            DeleteTask(t, t.TaskTime.ToString("yyyy-MM"));
+        }
+        public static void DeleteArchivedTask(string studentId, DateTime finishedAt, Guid taskId)
+        {
+            Cassandra.ISession session = SessionManager.GetSession();
+
+            var ps = session.Prepare(
+                "DELETE FROM \"Archived_Tasks_By_Student\" WHERE student_id=? AND finished_at=? AND task_id=?"
+            );
+
+            session.Execute(ps.Bind(studentId, finishedAt, taskId));
+        }
+        
+        public static List<StudentOrganiserApp.Entities.Task> GetArchivedTasks(string studentId)
+        {
+            Cassandra.ISession session = SessionManager.GetSession();
+            var ps = session.Prepare("SELECT * FROM \"Archived_Tasks_By_Student\" WHERE student_id=?");
+            var rows = session.Execute(ps.Bind(studentId));
+            List<StudentOrganiserApp.Entities.Task> tasks = new List<StudentOrganiserApp.Entities.Task>();
+
+            foreach (var row in rows)
+            {
+                tasks.Add(new Entities.Task
+                {
+                    StudentId = row.GetValue<string>("student_id"),
+                    TaskId = row.GetValue<Guid>("task_id"),
+                    TaskTime = row.GetValue<DateTime>("finished_at"),
+                    Title = row.GetValue<string>("title"),
+                    Type = row.GetValue<string>("type"),
+                    Priority = row.GetValue<int>("priority")
+                });
+            }
+            return tasks;
+        }
+
+        #endregion
     }
 }

@@ -13,7 +13,21 @@ namespace StudentOrganiserApi.Controllers
     [Route("api/students/{studentId}/tasks")]
     public class TasksController : ControllerBase
     {
-    
+        [HttpGet("{taskId}")]
+        public ActionResult<StudentOrganiserApp.Entities.Task> GetTask(string studentId,Guid taskId, [FromQuery] DateTime taskTime)
+        {
+            if (taskTime == default)
+                return BadRequest("taskTime query param je obavezan.");
+
+            string period = taskTime.ToString("yyyy-MM");
+
+            var task = DataProvider.GetTask(studentId, period, taskTime, taskId);
+            if (task == null)
+                return NotFound();
+
+            return Ok(task);
+        }
+
         [HttpPost]
         public IActionResult CreateTask(string studentId, [FromBody] StudentOrganiserApp.Entities.Task newTask)
         {
@@ -97,17 +111,6 @@ namespace StudentOrganiserApi.Controllers
             return Ok(history);
         }
         
-        [HttpGet("period/{period}")]
-        public ActionResult<List<StudentOrganiserApp.Entities.Task>> GetTasksByPeriod(string studentId, string period)
-        {
-            if (!Regex.IsMatch(period, @"^\d{4}-\d{2}$"))
-            {
-                return BadRequest("Neispravan format perioda. Koristite 'yyyy-MM'.");
-            }
-            var tasks = DataProvider.GetTasksByStudentAndPeriod(studentId, period);
-            return Ok(tasks);
-        }
-
         [HttpGet("daily/{date}")]
         public ActionResult<List<StudentOrganiserApp.Entities.Task>> GetDailyTasks(string studentId, string date)
         {

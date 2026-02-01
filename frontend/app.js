@@ -95,30 +95,52 @@ function renderMainApp(student) {
     userInfo.append(studentSpan, logoutButton);
     header.append(title, userInfo);
 
+    const contentDiv = document.createElement('div');
+    contentDiv.id = 'content';
+
+    const filterContainer = document.createElement('div');
+    filterContainer.id = 'filter-container';
+
+    const filterBar = ui.createFilterBar(async (selectedType) => {
+        clearContainer(contentDiv);
+        if (selectedType === 'Sve') {
+            await renderDailyView(contentDiv, studentId); 
+        } else {
+            await renderFilteredTasks(contentDiv, studentId, selectedType);
+        }
+    });
+    filterContainer.appendChild(filterBar);
+
     const switcher = ui.createViewSwitcher(currentView, (view) => {
         currentView = view;
         renderContent();
     });
 
-    const contentDiv = document.createElement('div');
-    contentDiv.id = 'content';
-
-    appContainer.append(header, switcher, contentDiv);
+    appContainer.append(header, switcher, filterContainer, contentDiv);
 
     async function renderContent() {
         clearContainer(contentDiv);
+        filterContainer.style.display = currentView === 'daily' ? 'block' : 'none';
+
         if (currentView === 'daily') {
             await renderDailyView(contentDiv, studentId);
-        } else {
+        } else if (currentView === 'weekly') {
             await renderWeeklyView(contentDiv, studentId);
+        } else if (currentView === 'archived') {
+            await renderArchivedView(contentDiv, studentId);
         }
     }
 
     renderContent();
 }
 
-async function renderDailyView(container, studentId) {
-    const tasks = await fetchData(`/students/${studentId}/tasks/daily/${helpers.getTodayDateStr()}`);
+async function renderDailyView(container, studentId, currentFilter = 'Sve') {
+    let tasks = await fetchData(`/students/${studentId}/tasks/daily/${helpers.getTodayDateStr()}`);
+    
+    if (currentFilter !== 'Sve') {
+        tasks = tasks.filter(t => t.type === currentFilter);
+    }
+
     const dailyContainer = document.createElement('div');
     dailyContainer.className = 'daily-view-container';
 
@@ -131,10 +153,22 @@ async function renderDailyView(container, studentId) {
         p.textContent = 'Nema obaveza za danas.';
         dailyContainer.appendChild(p);
     } else {
-        tasks.forEach(task => dailyContainer.appendChild(ui.createTaskItemElement(task, (t, c) => handleStatusChange(t, c, studentId))));
+        tasks.forEach(task => {
+            const taskEl = ui.createTaskItemElement(task, (t, c) => handleStatusChange(t, c, studentId));
+            
+            const advancedTools = ui.createTaskItemAdvanced(
+                task, 
+                studentId, 
+                (sid, tid, title) => renderHistoryView(container, sid, tid, title),
+                (t, sid) => archiveTaskAction(t, sid)
+            );
+            
+            taskEl.appendChild(advancedTools);
+            dailyContainer.appendChild(taskEl);
+        });
     }
 
-    container.append(dailyContainer, ui.createAddTaskForm((e, f) => handleFormSubmit(e, f, studentId)));
+    container.append(dailyContainer, ui.createAddTaskForm((e, f) => handleFormSubmit(e, f, studentId, currentFilter)));
 }
 
 async function renderWeeklyView(container, studentId) {
@@ -235,7 +269,7 @@ function openEditModal(task, studentId) {
     document.body.appendChild(overlay);
 }
 
-async function handleFormSubmit(e, form, studentId) {
+async function handleFormSubmit(e, form, studentId, currentFilter = 'Sve') {
     e.preventDefault();
     const newTask = {
         title: form.querySelector('#title-input').value,
@@ -246,8 +280,9 @@ async function handleFormSubmit(e, form, studentId) {
         status: 'Na čekanju'
     };
     if (await sendData(`/students/${studentId}/tasks`, 'POST', newTask)) {
-        const student = getStudent();
-        if (student) renderMainApp(student);
+        const contentDiv = document.getElementById('content');
+        clearContainer(contentDiv);
+        await renderDailyView(contentDiv, studentId, currentFilter);
     }
 }
 
@@ -259,3 +294,130 @@ document.addEventListener('DOMContentLoaded', () => {
         renderLoginForm();
     }
 });
+
+async function renderHistoryView(container, studentId, taskId, taskTitle) {
+    clearContainer(container);
+    const history = await fetchData(`/students/${studentId}/tasks/${taskId}/history`);
+    
+    const h2 = document.createElement('h2');
+    h2.textContent = `Istorija statusa za: ${taskTitle}`;
+    
+    const table = document.createElement('table');
+    table.className = 'history-table';
+    
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    ['Vreme promene', 'Stari status', 'Novi status'].forEach(text => {
+        const th = document.createElement('th');
+        th.textContent = text;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    
+    const tbody = document.createElement('tbody');
+    history.forEach(h => {
+        const tr = document.createElement('tr');
+        const d = new Date(h.changeTime);
+        
+        [d.toLocaleString('sr-RS'), h.oldStatus, h.newStatus].forEach(val => {
+            const td = document.createElement('td');
+            td.textContent = val;
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    
+    table.append(thead, tbody);
+    const backBtn = document.createElement('button');
+    backBtn.textContent = 'Nazad na planer';
+    backBtn.className = 'btn-confirm btn-back';
+    backBtn.onclick = () => renderMainApp(getStudent());
+
+    container.append(h2, table, backBtn);
+}
+
+async function archiveTaskAction(task, studentId) {
+    ui.showCustomModal('Arhiviranje', `Da li želite da arhivirate "${task.title}"?`, async () => {
+        if (await sendData(`/students/${studentId}/tasks/${task.taskId}/archive`, 'POST', task)) {
+            renderMainApp(getStudent());
+        }
+    });
+}
+
+async function renderArchivedView(container, studentId) {
+    clearContainer(container);
+    const tasks = await fetchData(`/students/${studentId}/archived-tasks`);
+    
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Arhiva završenih obaveza';
+
+    const grid = document.createElement('div');
+    grid.className = 'archived-grid';
+
+    tasks.forEach(t => {
+        console.log('ARCHIVED TASK:', t);
+    
+        const card = document.createElement('div');
+        card.className = 'task-card archived';
+        
+        const title = document.createElement('strong');
+        title.textContent = t.title;
+    
+        const finishedDate = new Date(t.taskTime + 'Z');
+    
+        const date = document.createElement('span');
+        date.textContent =
+            ` Završeno: ${finishedDate.toLocaleString('sr-RS')}`;
+    
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'x';
+        delBtn.className = 'delete-task-btn';
+    
+        delBtn.onclick = () => {
+            ui.showCustomModal(
+                'Trajno brisanje',
+                `Obrisati arhiviranu obavezu "${t.title}"?`,
+                async () => {
+                    const finishedAt = encodeURIComponent(
+                        finishedDate.toISOString()
+                    );
+    
+                    const endpoint =
+                        `/students/${studentId}/archived-tasks/${t.taskId}?finishedAt=${finishedAt}`;
+    
+                    if (await sendData(endpoint, 'DELETE')) {
+                        renderArchivedView(container, studentId);
+                    }
+                }
+            );
+        };
+    
+        card.append(title, date, delBtn);
+        grid.appendChild(card);
+    });
+    
+
+    container.append(h2, grid);
+}
+
+
+async function renderFilteredTasks(container, studentId, type) {
+    clearContainer(container);
+    const tasks = await fetchData(`/students/${studentId}/tasks/type/${type}`);
+    
+    const uniqueTasks = tasks.filter((v, i, a) => a.findIndex(t => t.taskId === v.taskId) === i);
+
+    const filteredDiv = document.createElement('div');
+    filteredDiv.className = 'daily-view-container';
+    
+    const h2 = document.createElement('h2');
+    h2.textContent = `Lista: ${type}`;
+    filteredDiv.appendChild(h2);
+
+    uniqueTasks.forEach(task => {
+        const taskEl = ui.createTaskItemElement(task, (t, c) => handleStatusChange(t, c, studentId));
+        filteredDiv.appendChild(taskEl);
+    });
+
+    container.appendChild(filteredDiv);
+}

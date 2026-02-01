@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StudentOrganiserApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e55046ea95ac89cbf24d2da13459a4bae9079c35")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dc07395d6a0cc96849baea9f0f18b832c0f20511")]
 [assembly: System.Reflection.AssemblyProductAttribute("StudentOrganiserApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StudentOrganiserApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
