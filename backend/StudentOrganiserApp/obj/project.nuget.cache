@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "aPYmOBjP6zY=",
+  "dgSpecHash": "lSeiGWWh48g=",
   "success": true,
-  "projectFilePath": "C:\\Users\\nstoj\\Desktop\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
+  "projectFilePath": "C:\\Users\\nstoj\\Desktop\\FAKS\\IV godina\\Napredne baze\\Projekat 2\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nstoj\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\nstoj\\.nuget\\packages\\cassandracsharpdriver\\3.22.0\\cassandracsharpdriver.3.22.0.nupkg.sha512",

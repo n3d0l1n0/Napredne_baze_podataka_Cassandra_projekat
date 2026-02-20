@@ -1,0 +1,24 @@
+Pokretanje projekta
+
+Neophodne instalacije
+	1. Docker Desktop (za pokretanje Cassandra baze podataka)
+	2. .NET SDK (za pokretanje C# backend-a)
+
+Pokretanje baze podataka (Cassandra)
+Svi podaci za bazu nalaze se u priloženoj arhivi.
+
+!!! Pre pokretanja Docker komandi, prvo otpakujte arhivu `cassandra_data.zip` !!!
+
+	docker run -d --name cassandra-studenti -p 9042:9042 -v %cd%\cassandra_data:/var/lib/cassandra cassandra:3.11
+
+Pokretanje aplikacije (Backend)
+	1. Otvorite novi terminal u folderu gde se nalazi C# projekat.
+	2. Pokrenite komandu: dotnet watch run
+
+Pokretanje interfejsa (Frontend)
+	Nije potrebna instalacija dodatnih servera za frontend. 
+
+Nakon pokretanja aplikacije:
+	Ulogovati se kao student sa kredencijalima:
+- Index: s003
+- Password: sifra123
