@@ -103,11 +103,7 @@ function renderMainApp(student) {
 
     const filterBar = ui.createFilterBar(async (selectedType) => {
         clearContainer(contentDiv);
-        if (selectedType === 'Sve') {
-            await renderDailyView(contentDiv, studentId); 
-        } else {
-            await renderFilteredTasks(contentDiv, studentId, selectedType);
-        }
+        await renderDailyView(contentDiv, studentId, selectedType);
     });
     filterContainer.appendChild(filterBar);
 
@@ -398,26 +394,4 @@ async function renderArchivedView(container, studentId) {
     
 
     container.append(h2, grid);
-}
-
-
-async function renderFilteredTasks(container, studentId, type) {
-    clearContainer(container);
-    const tasks = await fetchData(`/students/${studentId}/tasks/type/${type}`);
-    
-    const uniqueTasks = tasks.filter((v, i, a) => a.findIndex(t => t.taskId === v.taskId) === i);
-
-    const filteredDiv = document.createElement('div');
-    filteredDiv.className = 'daily-view-container';
-    
-    const h2 = document.createElement('h2');
-    h2.textContent = `Lista: ${type}`;
-    filteredDiv.appendChild(h2);
-
-    uniqueTasks.forEach(task => {
-        const taskEl = ui.createTaskItemElement(task, (t, c) => handleStatusChange(t, c, studentId));
-        filteredDiv.appendChild(taskEl);
-    });
-
-    container.appendChild(filteredDiv);
 }

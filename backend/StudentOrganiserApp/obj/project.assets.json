@@ -4210,11 +4210,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\nstoj\\Desktop\\FAKS\\IV godina\\Napredne baze\\Projekat 2\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
+      "projectUniqueName": "C:\\Users\\nstoj\\Desktop\\FAKS\\IV godina\\Napredne baze\\StudentOrganiserApp\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
       "projectName": "StudentOrganiserApp",
-      "projectPath": "C:\\Users\\nstoj\\Desktop\\FAKS\\IV godina\\Napredne baze\\Projekat 2\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
+      "projectPath": "C:\\Users\\nstoj\\Desktop\\FAKS\\IV godina\\Napredne baze\\StudentOrganiserApp\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\StudentOrganiserApp.csproj",
       "packagesPath": "C:\\Users\\nstoj\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\nstoj\\Desktop\\FAKS\\IV godina\\Napredne baze\\Projekat 2\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\obj\\",
+      "outputPath": "C:\\Users\\nstoj\\Desktop\\FAKS\\IV godina\\Napredne baze\\StudentOrganiserApp\\StudentOrganiserApp\\backend\\StudentOrganiserApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
